@@ -219,7 +219,8 @@ class FourPointSplineController(GenericSplineController):
     def __init__(self,
                  exo: Exo,
                  rise_fraction: float = 0.2,
-                 peak_torque: float = 5,
+                 left_peak_torque: float = 5,
+                 right_peak_torque: float = 5,
                  peak_fraction: float = 0.55,
                  fall_fraction: float = 0.6,
                  Kp: int = constants.DEFAULT_KP,
@@ -233,20 +234,35 @@ class FourPointSplineController(GenericSplineController):
         '''Inherits from GenericSplineController, and adds a update_spline_with_list function.'''
         self.bias_torque = bias_torque  # Prevents rounding issues near zero and keeps cord taught
         self.peak_hold_time = peak_hold_time  # can be used to hold a peak
-        super().__init__(exo=exo,
+        if exo.side == constants.Side.LEFT:
+            super().__init__(exo=exo,
                          spline_x=self._get_spline_x(
                              rise_fraction, peak_fraction, fall_fraction),
-                         spline_y=self._get_spline_y(peak_torque),
+                         spline_y=self._get_spline_y(left_peak_torque),
+                         Kp=Kp, Ki=Ki, Kd=Kd, ff=ff,
+                         fade_duration=fade_duration,
+                         use_gait_phase=use_gait_phase)
+        else:
+            super().__init__(exo=exo,
+                         spline_x=self._get_spline_x(
+                             rise_fraction, peak_fraction, fall_fraction),
+                         spline_y=self._get_spline_y(right_peak_torque),
                          Kp=Kp, Ki=Ki, Kd=Kd, ff=ff,
                          fade_duration=fade_duration,
                          use_gait_phase=use_gait_phase)
 
     def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
         'Updates controller parameters from the config object.'''
-        super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
+        if self.exo.side == constants.Side.LEFT:
+            super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           peak_fraction=config.PEAK_FRACTION,
                                                           fall_fraction=config.FALL_FRACTION),
-                              spline_y=self._get_spline_y(peak_torque=config.PEAK_TORQUE))
+                              spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE))
+        else:
+            super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
+                                                          peak_fraction=config.PEAK_FRACTION,
+                                                          fall_fraction=config.FALL_FRACTION),
+                              spline_y=self._get_spline_y(right_peak_torque=config.RIGHT_PEAK_TORQUE))
 
     def _get_spline_x(self, rise_fraction, peak_fraction, fall_fraction) -> list:
         if self.peak_hold_time > 0:
@@ -254,11 +270,17 @@ class FourPointSplineController(GenericSplineController):
         else:
             return [0, rise_fraction, peak_fraction, fall_fraction, 10]
 
-    def _get_spline_y(self, peak_torque) -> list:
+    def _get_spline_y(self, left_peak_torque, right_peak_torque) -> list:
         if self.peak_hold_time > 0:
-            return [self.bias_torque, self.bias_torque, peak_torque, peak_torque, self.bias_torque, self.bias_torque]
+            if self.exo.side == constants.Side.LEFT:
+                return [self.bias_torque, self.bias_torque, left_peak_torque, left_peak_torque, self.bias_torque, self.bias_torque]
+            else:
+                return [self.bias_torque, self.bias_torque, right_peak_torque, right_peak_torque, self.bias_torque, self.bias_torque]
         else:
-            return [self.bias_torque, self.bias_torque, peak_torque, self.bias_torque, self.bias_torque]
+            if self.exo.side == constants.Side.LEFT:
+                return [self.bias_torque, self.bias_torque, left_peak_torque, self.bias_torque, self.bias_torque]
+            else:
+                return [self.bias_torque, self.bias_torque, right_peak_torque, self.bias_torque, self.bias_torque]
 
 
 class SmoothReelInController(Controller):

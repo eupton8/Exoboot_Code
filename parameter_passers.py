@@ -56,11 +56,12 @@ class ParameterPasser(threading.Thread):
 
                 if first_letter == 'v':
                     param_list = [float(x) for x in msg_content.split(',')]
-                    if len(param_list) != 4:
-                        print('Must send four spline points with v<>! message')
+                    if len(param_list) != 5:
+                        print('Must send five spline points with v<>! message')
                     else:
                         self.config.RISE_FRACTION = param_list[0]
-                        self.config.PEAK_TORQUE = param_list[1]
+                        self.config.LEFT_PEAK_TORQUE = param_list[1]
+                        self.config.RIGHT_PEAK_TORQUE = param_list[1]
                         self.config.PEAK_FRACTION = param_list[2]
                         self.config.FALL_FRACTION = param_list[3]
                 elif first_letter == 'k':
@@ -77,14 +78,22 @@ class ParameterPasser(threading.Thread):
                         print('SET_POINT updated to: ', msg_content)
                     else:
                         print('Must provide single integer to update SET_POINT')
-                elif first_letter == 'p':
+                elif first_letter == 'r':
                     if msg_content.isdigit():
                         if 0 <= int(msg_content) <= 40:
-                            self.config.PEAK_TORQUE = int(msg_content)
-                            print('Peak torque set to: ',
-                                  self.config.PEAK_TORQUE)
+                            self.config.RIGHT_PEAK_TORQUE = int(msg_content)
+                            print('RIGHT Peak torque set to: ',
+                                  self.config.RIGHT_PEAK_TORQUE)
                     else:
-                        print('Must provide single integer to update PEAK_TORQUE')
+                        print('Must provide single integer to update RIGHT_PEAK_TORQUE')
+                elif first_letter == 'l':
+                    if msg_content.isdigit():
+                        if 0 <= int(msg_content) <= 40:
+                            self.config.LEFT_PEAK_TORQUE = int(msg_content)
+                            print('LEFT Peak torque set to: ',
+                                  self.config.LEFT_PEAK_TORQUE)
+                    else:
+                        print('Must provide single integer to update LEFT_PEAK_TORQUE')
                 elif first_letter == 'd':
                     # Delay for slip detectors
                     self.config.SLIP_DETECT_DELAY = int(msg_content)
