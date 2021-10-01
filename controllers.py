@@ -234,7 +234,7 @@ class FourPointSplineController(GenericSplineController):
         '''Inherits from GenericSplineController, and adds a update_spline_with_list function.'''
         self.bias_torque = bias_torque  # Prevents rounding issues near zero and keeps cord taught
         self.peak_hold_time = peak_hold_time  # can be used to hold a peak
-        if exo.side == constants.Side.LEFT:
+        if self.exo.side == constants.Side.LEFT:
             super().__init__(exo=exo,
                          spline_x=self._get_spline_x(
                              rise_fraction, peak_fraction, fall_fraction),
