@@ -257,13 +257,13 @@ class FourPointSplineController(GenericSplineController):
     def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
         '''Updates controller parameters from the config object.'''
         if self.exo.side == constants.Side.LEFT:
-            print('Updating left')
+            print('LEFT: PEAK TORQUE= '+ config.LEFT_PEAK_TORQUE+ "\tPEAK FRACTION= "+config.PEAK_FRACTION)
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           peak_fraction=config.PEAK_FRACTION,
                                                           fall_fraction=config.FALL_FRACTION),
                               spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE, right_peak_torque=config.RIGHT_PEAK_TORQUE))
         else:
-            print('Updating right')
+            print('RIGHT: PEAK TORQUE= '+ config.RIGHT_PEAK_TORQUE+ "\tPEAK FRACTION= "+config.PEAK_FRACTION)
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           peak_fraction=config.PEAK_FRACTION,
                                                           fall_fraction=config.FALL_FRACTION),

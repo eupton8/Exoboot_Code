@@ -94,6 +94,14 @@ class ParameterPasser(threading.Thread):
                                   self.config.LEFT_PEAK_TORQUE)
                     else:
                         print('Must provide single integer to update LEFT_PEAK_TORQUE')
+                elif first_letter == 't':
+                    if msg_content.isdecimal():
+                        if 0 <= int(msg_content) <= 1:
+                            self.config.PEAK_FRACTION = int(msg_content)
+                            print('PEAK FRACTION set to : ',
+                                  self.config.PEAK_FRACTION)
+                    else:
+                        print('Must provide single integer to update PEAK_FRACTION')
                 elif first_letter == 'd':
                     # Delay for slip detectors
                     self.config.SLIP_DETECT_DELAY = int(msg_content)

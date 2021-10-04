@@ -7,6 +7,8 @@ config.NUM_STRIDES_REQUIRED = 3
 config.READ_ONLY = False
 config.LEFT_PEAK_TORQUE=5
 config.RIGHT_PEAK_TORQUE=5
+config.PEAK_FRACTION=0.53
+config.FALL_FRACTION=0.63
 
 
 ''' Here are the variables that are updatable in config, and their defaults:
