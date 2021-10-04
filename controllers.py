@@ -105,7 +105,7 @@ class SawickiWickiController(Controller):
         self.theta0_motor = self.exo.ankle_angle_to_motor_angle(theta0)
 
     def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
-        'Updates controller parameters from the config object.'''
+        '''Updates controller parameters from the config object.'''
         if self.k_val != config.K_VAL:
             self.k_val = config.K_VAL
             print('K updated to: ', self.k_val)
@@ -232,13 +232,16 @@ class FourPointSplineController(GenericSplineController):
                  use_gait_phase: bool = True,
                  peak_hold_time: float = 0):
         '''Inherits from GenericSplineController, and adds a update_spline_with_list function.'''
+        self.exo=exo
+        self.left_peak_torque=left_peak_torque
+        self.right_peak_torque=right_peak_torque
         self.bias_torque = bias_torque  # Prevents rounding issues near zero and keeps cord taught
         self.peak_hold_time = peak_hold_time  # can be used to hold a peak
-        if self.exo.side == constants.Side.LEFT:
+        if exo.side == constants.Side.LEFT:
             super().__init__(exo=exo,
                          spline_x=self._get_spline_x(
                              rise_fraction, peak_fraction, fall_fraction),
-                         spline_y=self._get_spline_y(left_peak_torque),
+                         spline_y=self._get_spline_y(left_peak_torque,right_peak_torque),
                          Kp=Kp, Ki=Ki, Kd=Kd, ff=ff,
                          fade_duration=fade_duration,
                          use_gait_phase=use_gait_phase)
@@ -246,23 +249,25 @@ class FourPointSplineController(GenericSplineController):
             super().__init__(exo=exo,
                          spline_x=self._get_spline_x(
                              rise_fraction, peak_fraction, fall_fraction),
-                         spline_y=self._get_spline_y(right_peak_torque),
+                         spline_y=self._get_spline_y(left_peak_torque,right_peak_torque),
                          Kp=Kp, Ki=Ki, Kd=Kd, ff=ff,
                          fade_duration=fade_duration,
                          use_gait_phase=use_gait_phase)
 
     def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
-        'Updates controller parameters from the config object.'''
+        '''Updates controller parameters from the config object.'''
         if self.exo.side == constants.Side.LEFT:
+            print('Updating left')
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           peak_fraction=config.PEAK_FRACTION,
                                                           fall_fraction=config.FALL_FRACTION),
-                              spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE))
+                              spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE, right_peak_torque=config.RIGHT_PEAK_TORQUE))
         else:
+            print('Updating right')
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           peak_fraction=config.PEAK_FRACTION,
                                                           fall_fraction=config.FALL_FRACTION),
-                              spline_y=self._get_spline_y(right_peak_torque=config.RIGHT_PEAK_TORQUE))
+                              spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE,right_peak_torque=config.RIGHT_PEAK_TORQUE))
 
     def _get_spline_x(self, rise_fraction, peak_fraction, fall_fraction) -> list:
         if self.peak_hold_time > 0:
@@ -282,7 +287,6 @@ class FourPointSplineController(GenericSplineController):
             else:
                 return [self.bias_torque, self.bias_torque, right_peak_torque, self.bias_torque, self.bias_torque]
 
-
 class SmoothReelInController(Controller):
     def __init__(self,
                  exo: Exo,
@@ -301,7 +305,7 @@ class SmoothReelInController(Controller):
             time_out: defines maximum amount of time to reel in
         Returns:
             Bool describing whether reel in operation has completed.
-         '''
+        '''
         self.exo = exo
         super().update_controller_gains(Kp=Kp, Ki=Ki, Kd=Kd, ff=ff)
         self.slack_cutoff = slack_cutoff
@@ -341,7 +345,7 @@ class BallisticReelInController(Controller):
             time_out: defines maximum amount of time to reel in
         Returns:
             Bool describing whether reel in operation has completed.
-         '''
+        '''
         self.exo = exo
         super().update_controller_gains(Kp=Kp, Ki=Ki, Kd=Kd, ff=ff)
         self.slack_cutoff = slack_cutoff
@@ -416,10 +420,11 @@ class GenericImpedanceController(Controller):
 
     def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants],
                                        update_k=True, update_b=True, update_setpoint=True):
-        'Updates controller parameters from the config object.'''
+        '''Updates controller parameters from the config object.'''
         if update_k:
             self.k_val = config.K_VAL
         if update_b:
             self.b_val = config.B_VAL
         if update_setpoint:
             self.setpoint = config.SET_POINT
+
