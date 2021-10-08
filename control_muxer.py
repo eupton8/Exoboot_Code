@@ -50,8 +50,8 @@ def get_gse_and_sm_lists(exo_list, config: Type[config_util.ConfigurableConstant
                 exo=exo, desired_slack=config.SWING_SLACK)
             if config.STANCE_CONTROL_STYLE == config_util.StanceCtrlStyle.FOURPOINTSPLINE:
                 stance_controller = controllers.FourPointSplineController(
-                    exo=exo, rise_fraction=config.RISE_FRACTION, left_peak_torque=config.LEFT_PEAK_TORQUE,right_peak_torque=config.RIGHT_PEAK_TORQUE, peak_fraction=config.PEAK_FRACTION,
-                    fall_fraction=config.FALL_FRACTION,
+                    exo=exo, rise_fraction=config.RISE_FRACTION, left_peak_torque=config.LEFT_PEAK_TORQUE,right_peak_torque=config.RIGHT_PEAK_TORQUE, left_peak_fraction=config.LEFT_PEAK_FRACTION,
+                    right_peak_fraction=config.RIGHT_PEAK_FRACTION,fall_fraction=config.FALL_FRACTION,
                     bias_torque=config.SPLINE_BIAS)
             elif config.STANCE_CONTROL_STYLE == config_util.StanceCtrlStyle.SAWICKIWICKI:
                 stance_controller = controllers.SawickiWickiController(
