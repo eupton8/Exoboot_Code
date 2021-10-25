@@ -110,6 +110,22 @@ class ParameterPasser(threading.Thread):
                             print("RIGHT PEAK FRACTION set to : ",self.config.RIGHT_PEAK_FRACTION)
                     else:
                        print('Must provide decimal to update RIGHT_PEAK_FRACTION')
+                elif first_letter == 'u':
+                    #print(msg_content)
+                    if float(msg_content)<1:
+                        if 0 <= float(msg_content) <= 1:
+                            self.config.LEFT_TOE_OFF_FRACTION = float(msg_content)
+                            print('LEFT PEAK FRACTION set to : ',
+                                  self.config.LEFT_TOE_OFF_FRACTION)
+                    else:
+                        print('Must provide decimal to update LEFT_PEAK_FRACTION')
+                elif first_letter=="i":
+                    if float(msg_content)<1:
+                       if 0<= float(msg_content)<=1:
+                            self.config.RIGHT_TOE_OFF_FRACTION =float(msg_content)
+                            print("RIGHT PEAK FRACTION set to : ",self.config.RIGHT_TOE_OFF_FRACTION)
+                    else:
+                       print('Must provide decimal to update RIGHT_PEAK_FRACTION')
                 elif first_letter == 'd':
                     # Delay for slip detectors
                     self.config.SLIP_DETECT_DELAY = int(msg_content)

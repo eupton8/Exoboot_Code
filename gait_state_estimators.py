@@ -9,6 +9,7 @@ from typing import Type
 import util
 import config_util
 import ml_util
+from exoboot import Exo
 
 
 class GaitStateEstimator():
@@ -70,7 +71,7 @@ class MLGaitStateEstimator():
         gait_phase_estimator = StrideAverageGaitPhaseEstimator(
             num_strides_required=default_config.NUM_STRIDES_REQUIRED)
         toe_off_detector = GaitPhaseBasedToeOffDetector(
-            fraction_of_gait=default_config.TOE_OFF_FRACTION)
+            right_fraction_of_gait=default_config.RIGHT_TOE_OFF_FRACTION,left_fraction_of_gait=default_config.LEFT_TOE_OFF_FRACTION)
         self.parallel_tbe = GaitStateEstimator(
             data_container=self.fake_data, heel_strike_detector=heel_strike_detector,
             gait_phase_estimator=gait_phase_estimator, toe_off_detector=toe_off_detector)
@@ -143,24 +144,39 @@ class GyroHeelStrikeDetector():
 
 
 class GaitPhaseBasedToeOffDetector():
-    def __init__(self, fraction_of_gait):
+    def __init__(self, exo: Exo , right_fraction_of_gait, left_fraction_of_gait):
         '''Uses gait phase estimated from heel strikes to estimate toe-off.'''
-        self.fraction_of_gait = fraction_of_gait
+        self.exo=exo
+        self.right_fraction_of_gait = right_fraction_of_gait
+        self.left_fraction_of_gait = left_fraction_of_gait
         self.has_toe_off_occurred = False
 
     def detect(self, data: Type[exoboot.Exo.DataContainer]):
         gait_phase = data.gait_phase
-        if gait_phase is None:
-            did_toe_off = False
-        else:
-            if gait_phase < self.fraction_of_gait:
-                self.has_toe_off_occurred = False
-            if gait_phase > self.fraction_of_gait and self.has_toe_off_occurred is False:
-                did_toe_off = True
-                self.has_toe_off_occurred = True
-            else:
+        if self.exo.side == constants.Side.LEFT:
+            if gait_phase is None:
                 did_toe_off = False
-        return did_toe_off
+            else:
+                if gait_phase < self.left_fraction_of_gait:
+                    self.has_toe_off_occurred = False
+                if gait_phase > self.left_fraction_of_gait and self.has_toe_off_occurred is False:
+                    did_toe_off = True
+                    self.has_toe_off_occurred = True
+                else:
+                    did_toe_off = False
+            return did_toe_off
+        else:
+            if gait_phase is None:
+                did_toe_off = False
+            else:
+                if gait_phase < self.right_fraction_of_gait:
+                    self.has_toe_off_occurred = False
+                if gait_phase > self.right_fraction_of_gait and self.has_toe_off_occurred is False:
+                    did_toe_off = True
+                    self.has_toe_off_occurred = True
+                else:
+                    did_toe_off = False
+            return did_toe_off
 
 
 class StrideAverageGaitPhaseEstimator():

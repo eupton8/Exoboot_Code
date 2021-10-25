@@ -58,7 +58,8 @@ class ConfigurableConstants():
     HS_GYRO_FILTER_WN: float = 3
     HS_GYRO_DELAY: float = 0.05
     SWING_SLACK: int = 10000
-    TOE_OFF_FRACTION: float = 0.60
+    RIGHT_TOE_OFF_FRACTION: float = 0.60
+    LEFT_TOE_OFF_FRACTION: float = 0.60
     REEL_IN_MV: int = 1200
     REEL_IN_SLACK_CUTOFF: int = 1200
     REEL_IN_TIMEOUT: float = 0.2
@@ -67,7 +68,8 @@ class ConfigurableConstants():
 
     # 4 point Spline
     RISE_FRACTION: float = 0.2
-    PEAK_FRACTION: float = 0.53
+    RIGHT_PEAK_FRACTION: float = 0.53
+    LEFT_PEAK_FRACTION: float = 0.53
     FALL_FRACTION: float = 0.60
     LEFT_PEAK_TORQUE: float = 5
     RIGHT_PEAK_TORQUE: float = 5
