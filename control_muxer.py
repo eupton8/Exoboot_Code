@@ -31,7 +31,7 @@ def get_gse_and_sm_lists(exo_list, config: Type[config_util.ConfigurableConstant
             gait_phase_estimator = gait_state_estimators.StrideAverageGaitPhaseEstimator(
                 num_strides_required=config.NUM_STRIDES_REQUIRED)
             toe_off_detector = gait_state_estimators.GaitPhaseBasedToeOffDetector(
-                fraction_of_gait=config.TOE_OFF_FRACTION)
+                exo=exo,right_fraction_of_gait=config.RIGHT_TOE_OFF_FRACTION, left_fraction_of_gait= config.LEFT_TOE_OFF_FRACTION)
             gait_state_estimator = gait_state_estimators.GaitStateEstimator(
                 side=exo.side,
                 data_container=exo.data,

@@ -115,7 +115,7 @@ class ParameterPasser(threading.Thread):
                     if float(msg_content)<1:
                         if 0 <= float(msg_content) <= 1:
                             self.config.LEFT_TOE_OFF_FRACTION = float(msg_content)
-                            print('LEFT PEAK FRACTION set to : ',
+                            print('LEFT TOE OFF FRACTION set to : ',
                                   self.config.LEFT_TOE_OFF_FRACTION)
                     else:
                         print('Must provide decimal to update LEFT_PEAK_FRACTION')
@@ -123,7 +123,7 @@ class ParameterPasser(threading.Thread):
                     if float(msg_content)<1:
                        if 0<= float(msg_content)<=1:
                             self.config.RIGHT_TOE_OFF_FRACTION =float(msg_content)
-                            print("RIGHT PEAK FRACTION set to : ",self.config.RIGHT_TOE_OFF_FRACTION)
+                            print("RIGHT TOE OFF FRACTION set to : ",self.config.RIGHT_TOE_OFF_FRACTION)
                     else:
                        print('Must provide decimal to update RIGHT_PEAK_FRACTION')
                 elif first_letter == 'd':
