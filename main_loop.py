@@ -16,6 +16,10 @@ import control_muxer
 import plotters
 import ml_util
 import traceback
+import socket
+import os
+import re
+#from Exo.DataContainer import gyro_z
 
 s = socket.socket()  # Create a socket object
 port = 50000  # Reserve a port for your service every new transfer wants a new port or you must wait.  
@@ -24,6 +28,8 @@ x = 0
 st = str(x)
 byt = st.encode()
 s.send(byt)
+
+#gyro_z=exoboot.DataContainer[1]
 
 config = config_util.load_config_from_args()  # loads config from passed args
 file_ID = input(
@@ -74,7 +80,7 @@ keyboard_thread = parameter_passers.ParameterPasser(
 config_saver.write_data(loop_time=0)  # Write first row on config
 only_write_if_new = not config.READ_ONLY and config.ONLY_LOG_IF_NEW
 
-
+lastPlotTime=0
 while True:
     try:
         timer.pause()
@@ -103,7 +109,7 @@ while True:
             exo.write_data(only_write_if_new=only_write_if_new)
 
         if time.perf_counter()-lastPlotTime>0.5:
-            st = str(gait_state_estimator.gyro_filter.filter(data.gyro_z))
+            st = str(exo.read_data.data.gyro_z)
             byt = st.encode()
             s.send(byt)
             lastPlotTime=time.perf_counter()
