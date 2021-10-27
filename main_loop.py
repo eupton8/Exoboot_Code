@@ -29,7 +29,7 @@ st = str(x)
 byt = st.encode()
 s.send(byt)
 
-#gyro_z=exoboot.DataContainer[1]
+
 
 config = config_util.load_config_from_args()  # loads config from passed args
 file_ID = input(
@@ -70,6 +70,8 @@ else:
 input('Press any key to begin')
 print('Start!')
 
+
+
 '''Main Loop: Check param updates, Read data, calculate gait state, apply control, write data.'''
 timer = util.FlexibleTimer(
     target_freq=config.TARGET_FREQ)  # attempts constants freq
@@ -81,6 +83,7 @@ config_saver.write_data(loop_time=0)  # Write first row on config
 only_write_if_new = not config.READ_ONLY and config.ONLY_LOG_IF_NEW
 
 lastPlotTime=0
+gyro_z=exo.data.gyro_z
 while True:
     try:
         timer.pause()
@@ -109,7 +112,7 @@ while True:
             exo.write_data(only_write_if_new=only_write_if_new)
 
         if time.perf_counter()-lastPlotTime>0.5:
-            st = str(exo.read_data.data.gyro_z)
+            st = str(exo.data.gyro_z)
             byt = st.encode()
             s.send(byt)
             lastPlotTime=time.perf_counter()
