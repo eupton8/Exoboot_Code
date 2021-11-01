@@ -19,7 +19,12 @@ import traceback
 import socket
 import os
 import re
+from numpy import diff
 #from Exo.DataContainer import gyro_z
+
+global pastTLABuf, peakTLA, valleyTLA
+pastTLABuf=[0]*8
+valleyTLA=peakTLA=[]
 
 s = socket.socket()  # Create a socket object
 port = 50000  # Reserve a port for your service every new transfer wants a new port or you must wait.  
@@ -29,7 +34,30 @@ st = str(x)
 byt = st.encode()
 s.send(byt)
 
+def determineMinMaxData(anyData):
+    global pastDataBuf
+    global peakData
+    global valleyData
+    global pastData
 
+    dataDiff=diff(pastDataBuf)
+    if (dataDiff[0]>0 and dataDiff[1]<=0 and dataDiff[2]<=0 and dataDiff[3]<=0 and pastDataBuf[1]>1):
+        peakData.append(pastDataBuf[1])
+        #maxTLA=1
+        #print("PEAK TLA REACHED: "+str(pastTLABuf[1]))
+        st = str(pastDataBuf[1])
+        byt = st.encode()
+        s.send(byt)
+        lastPlotTime=time.perf_counter()        
+        pastTLA=pastDataBuf[1]
+    else:
+        maxData=0
+        minData=0
+        peakDataMean=0
+
+    pastDataBuf.pop(0)
+    pastDataBuf.append(anyData)
+    return peakData
 
 config = config_util.load_config_from_args()  # loads config from passed args
 file_ID = input(
@@ -84,6 +112,7 @@ only_write_if_new = not config.READ_ONLY and config.ONLY_LOG_IF_NEW
 
 lastPlotTime=0
 gyro_z=exo.data.gyro_z
+appliedTorque=exo.data.ankle_torque_from_current
 while True:
     try:
         timer.pause()
@@ -110,12 +139,15 @@ while True:
                 state_machine.step(read_only=config.READ_ONLY)
         for exo in exo_list:
             exo.write_data(only_write_if_new=only_write_if_new)
-
+        
+        maxValue=determineMinMaxData(gyro_z)
+        '''
         if time.perf_counter()-lastPlotTime>0.5:
             st = str(exo.data.gyro_z)
             byt = st.encode()
             s.send(byt)
             lastPlotTime=time.perf_counter()
+        '''
 
     except KeyboardInterrupt:
         print('Ctrl-C detected, Exiting Gracefully')
