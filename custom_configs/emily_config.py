@@ -15,7 +15,8 @@ config.LEFT_PEAK_FRACTION=0.58
 config.RIGHT_TOE_OFF_FRACTION=0.63
 config.LEFT_TOE_OFF_FRACTION=0.63
 
-config.FALL_FRACTION=0.63
+config.RIGHT_FALL_FRACTION=0.63
+config.LEFT_FALL_FRACTION=0.63
 
 
 ''' Here are the variables that are updatable in config, and their defaults:

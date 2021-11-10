@@ -135,7 +135,7 @@ while True:
 
         for exo in exo_list:
             exo.read_data(loop_time=loop_time)
-            maxValue=determineMinMaxData(exo.data.ankle_torque_from_current,exo)
+            #maxValue=determineMinMaxData(exo.data.ankle_torque_from_current,exo)
         for gait_state_estimator in gait_state_estimator_list:
             gait_state_estimator.detect()
         if not config.READ_ONLY:

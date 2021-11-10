@@ -223,7 +223,8 @@ class FourPointSplineController(GenericSplineController):
                  right_peak_torque: float = 5,
                  left_peak_fraction: float = 0.55,
                  right_peak_fraction: float = 0.55,
-                 fall_fraction: float = 0.6,
+                 left_fall_fraction: float = 0.6,
+                 right_fall_fraction: float = 0.6,
                  Kp: int = constants.DEFAULT_KP,
                  Ki: int = constants.DEFAULT_KI,
                  Kd: int = constants.DEFAULT_KD,
@@ -238,12 +239,14 @@ class FourPointSplineController(GenericSplineController):
         self.right_peak_torque=right_peak_torque
         self.right_peak_fraction=right_peak_fraction
         self.left_peak_fraction=left_peak_fraction
+        self.right_fall_fraction=right_fall_fraction
+        self.left_fall_fraction=left_fall_fraction
         self.bias_torque = bias_torque  # Prevents rounding issues near zero and keeps cord taught
         self.peak_hold_time = peak_hold_time  # can be used to hold a peak
         if exo.side == constants.Side.LEFT:
             super().__init__(exo=exo,
                          spline_x=self._get_spline_x(
-                             rise_fraction, left_peak_fraction,right_peak_fraction, fall_fraction),
+                             rise_fraction, left_peak_fraction,right_peak_fraction, left_fall_fraction, right_fall_fraction),
                          spline_y=self._get_spline_y(left_peak_torque,right_peak_torque),
                          Kp=Kp, Ki=Ki, Kd=Kd, ff=ff,
                          fade_duration=fade_duration,
@@ -251,7 +254,7 @@ class FourPointSplineController(GenericSplineController):
         else:
             super().__init__(exo=exo,
                          spline_x=self._get_spline_x(
-                             rise_fraction, left_peak_fraction,right_peak_fraction, fall_fraction),
+                             rise_fraction, left_peak_fraction,right_peak_fraction, left_fall_fraction,right_fall_fraction),
                          spline_y=self._get_spline_y(left_peak_torque,right_peak_torque),
                          Kp=Kp, Ki=Ki, Kd=Kd, ff=ff,
                          fade_duration=fade_duration,
@@ -260,31 +263,33 @@ class FourPointSplineController(GenericSplineController):
     def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
         '''Updates controller parameters from the config object.'''
         if self.exo.side == constants.Side.LEFT:
-            print("\nLEFT: PEAK TORQUE= "+ str(config.LEFT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.LEFT_PEAK_FRACTION)+ "\tToe Off= "+str(config.LEFT_TOE_OFF_FRACTION))
+            print("\nLEFT: PEAK TORQUE= "+ str(config.LEFT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.LEFT_PEAK_FRACTION)+ "\tToe Off= "+str(config.LEFT_TOE_OFF_FRACTION)+ "\tFall Fraction= "+str(config.LEFT_FALL_FRACTION))
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           left_peak_fraction=config.LEFT_PEAK_FRACTION,
                                                           right_peak_fraction=config.RIGHT_PEAK_FRACTION,
-                                                          fall_fraction=config.FALL_FRACTION),
+                                                          left_fall_fraction=config.LEFT_FALL_FRACTION,
+                                                          right_fall_fraction=config.RIGHT_FALL_FRACTION),
                               spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE, right_peak_torque=config.RIGHT_PEAK_TORQUE))
         else:
-            print("RIGHT: PEAK TORQUE= "+ str(config.RIGHT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.RIGHT_PEAK_FRACTION)+ "\tToe Off= "+str(config.RIGHT_TOE_OFF_FRACTION)+"\n")
+            print("RIGHT: PEAK TORQUE= "+ str(config.RIGHT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.RIGHT_PEAK_FRACTION)+ "\tToe Off= "+str(config.RIGHT_TOE_OFF_FRACTION)+ "\tFall Fraction= "+str(config.RIGHT_FALL_FRACTION)+"\n")
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           left_peak_fraction=config.LEFT_PEAK_FRACTION,
                                                           right_peak_fraction=config.RIGHT_PEAK_FRACTION,
-                                                          fall_fraction=config.FALL_FRACTION),
+                                                          left_fall_fraction=config.LEFT_FALL_FRACTION,
+                                                          right_fall_fraction=config.RIGHT_FALL_FRACTION),
                               spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE,right_peak_torque=config.RIGHT_PEAK_TORQUE))
 
-    def _get_spline_x(self, rise_fraction, left_peak_fraction,right_peak_fraction, fall_fraction) -> list:
+    def _get_spline_x(self, rise_fraction, left_peak_fraction,right_peak_fraction, left_fall_fraction, right_fall_fraction) -> list:
         if self.peak_hold_time > 0:
             if self.exo.side == constants.Side.LEFT:
-            	return [0, rise_fraction, left_peak_fraction, left_peak_fraction+self.peak_hold_time, fall_fraction, 1]
+            	return [0, rise_fraction, left_peak_fraction, left_peak_fraction+self.peak_hold_time, left_fall_fraction, 1]
             else:
-                return [0,rise_fraction,right_peak_fraction,right_peak_fraction+self.peak_hold_time,fall_fraction,1]
+                return [0,rise_fraction,right_peak_fraction,right_peak_fraction+self.peak_hold_time,right_fall_fraction,1]
         else:
             if self.exo.side == constants.Side.LEFT:
-            	return [0, rise_fraction, left_peak_fraction, fall_fraction, 10]
+            	return [0, rise_fraction, left_peak_fraction, left_fall_fraction, 10]
             else:
-                return [0,rise_fraction,right_peak_fraction,fall_fraction,10]
+                return [0,rise_fraction,right_peak_fraction,right_fall_fraction,10]
 
     def _get_spline_y(self, left_peak_torque, right_peak_torque) -> list:
         if self.peak_hold_time > 0:

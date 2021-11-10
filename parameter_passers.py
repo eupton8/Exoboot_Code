@@ -126,6 +126,22 @@ class ParameterPasser(threading.Thread):
                             print("RIGHT TOE OFF FRACTION set to : ",self.config.RIGHT_TOE_OFF_FRACTION)
                     else:
                        print('Must provide decimal to update RIGHT_PEAK_FRACTION')
+                elif first_letter == 'o':
+                    #print(msg_content)
+                    if float(msg_content)<1:
+                        if 0 <= float(msg_content) <= 1:
+                            self.config.LEFT_FALL_FRACTION = float(msg_content)
+                            print('LEFT FALL FRACTION set to : ',
+                                  self.config.LEFT_FALL_FRACTION)
+                    else:
+                        print('Must provide decimal to update LEFT_FALL_FRACTION')
+                elif first_letter=="p":
+                    if float(msg_content)<1:
+                       if 0<= float(msg_content)<=1:
+                            self.config.RIGHT_FALL_FRACTION =float(msg_content)
+                            print("RIGHT FALL FRACTION set to : ",self.config.RIGHT_FALL_FRACTION)
+                    else:
+                       print('Must provide decimal to update RIGHT_FALL_FRACTION')
                 elif first_letter == 'd':
                     # Delay for slip detectors
                     self.config.SLIP_DETECT_DELAY = int(msg_content)
