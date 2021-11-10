@@ -36,15 +36,14 @@ while True:
             data = conn.recv(1024)
 
             newData=data.decode()
-            '''
-	    for k in range(len(newData)):
+            for k in range(len(newData)):
                 if newData[k]==".":
                     parsedData=newData[:k+3]
                     break
                 else:
                     parsedData=newData
-            '''
-            print(newData)
+            
+            print(parsedData)
             #print('Server received ', data.decode())
             #if type(float(data.decode()))== float:
             '''
@@ -58,8 +57,8 @@ while True:
                     plt.show()
                     plt.pause(0.0001)
             '''
-            plt.scatter(x,float(newData))
-            #plt.plot(x,parsedData,'b-')
+            plt.scatter(x,float(parsedData))
+            ##plt.plot(x,parsedData,'b-')
             plt.show()
             plt.pause(0.0001)
             

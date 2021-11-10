@@ -2,15 +2,19 @@
 import config_util
 config = config_util.ConfigurableConstants()
 config.DO_READ_FSRS = True
-config.VARS_TO_PLOT = ['heel_fsr', 'toe_fsr']
+config.VARS_TO_PLOT = ['gyro_z']
 config.NUM_STRIDES_REQUIRED = 3
 config.READ_ONLY = False
-config.LEFT_PEAK_TORQUE=5
-config.RIGHT_PEAK_TORQUE=5
+
+config.LEFT_PEAK_TORQUE=17
+config.RIGHT_PEAK_TORQUE=19
+
 config.RIGHT_PEAK_FRACTION=0.53
-config.LEFT_PEAK_FRACTION=0.53
-config.RIGHT_TOE_OFF_FRACTION=0.6
-config.LEFT_TOE_OFF_FRACTION=0.6
+config.LEFT_PEAK_FRACTION=0.58
+
+config.RIGHT_TOE_OFF_FRACTION=0.63
+config.LEFT_TOE_OFF_FRACTION=0.63
+
 config.FALL_FRACTION=0.63
 
 

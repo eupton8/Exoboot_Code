@@ -22,10 +22,10 @@ import re
 from numpy import diff
 #from Exo.DataContainer import gyro_z
 
-global pastTLABuf, peakTLA, valleyTLA
-pastTLABuf=[0]*8
-valleyTLA=peakTLA=[]
-
+global pastDataBuf, peakData, valleyData
+pastDataBuf=[0]*8
+valleyData=peakData=[]
+'''
 s = socket.socket()  # Create a socket object
 port = 50000  # Reserve a port for your service every new transfer wants a new port or you must wait.  
 s.connect(('localhost', port))
@@ -33,8 +33,8 @@ x = 0
 st = str(x)
 byt = st.encode()
 s.send(byt)
-
-def determineMinMaxData(anyData):
+'''
+def determineMinMaxData(anyData,exo):
     global pastDataBuf
     global peakData
     global valleyData
@@ -43,13 +43,16 @@ def determineMinMaxData(anyData):
     dataDiff=diff(pastDataBuf)
     if (dataDiff[0]>0 and dataDiff[1]<=0 and dataDiff[2]<=0 and dataDiff[3]<=0 and pastDataBuf[1]>1):
         peakData.append(pastDataBuf[1])
-        #maxTLA=1
-        #print("PEAK TLA REACHED: "+str(pastTLABuf[1]))
-        st = str(pastDataBuf[1])
-        byt = st.encode()
-        s.send(byt)
+        #maxTLA=
+        if exo.side==constants.Side.LEFT:
+             print("LEFT PEAK VALUE REACHED: "+str(pastDataBuf[1]))
+        else:
+             print("RIGHT PEAK VALUE REACHED: " +str(pastDataBuf[1]))
+        #st = str(pastDataBuf[1])
+        #byt = st.encode()
+        #s.send(byt)
         lastPlotTime=time.perf_counter()        
-        pastTLA=pastDataBuf[1]
+        pastData=pastDataBuf[1]
     else:
         maxData=0
         minData=0
@@ -132,6 +135,7 @@ while True:
 
         for exo in exo_list:
             exo.read_data(loop_time=loop_time)
+            maxValue=determineMinMaxData(exo.data.ankle_torque_from_current,exo)
         for gait_state_estimator in gait_state_estimator_list:
             gait_state_estimator.detect()
         if not config.READ_ONLY:
@@ -139,8 +143,9 @@ while True:
                 state_machine.step(read_only=config.READ_ONLY)
         for exo in exo_list:
             exo.write_data(only_write_if_new=only_write_if_new)
-        
-        maxValue=determineMinMaxData(gyro_z)
+            #maxValue=determineMinMaxData(exo.data.ankle_torque_from_current)
+        #print(exo.data.ankle_torque_from_current)
+        #maxValue=determineMinMaxData(exo.data.ankle_torque_from_current)
         '''
         if time.perf_counter()-lastPlotTime>0.5:
             st = str(exo.data.gyro_z)

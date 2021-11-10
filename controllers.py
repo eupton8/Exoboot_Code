@@ -260,14 +260,14 @@ class FourPointSplineController(GenericSplineController):
     def update_ctrl_params_from_config(self, config: Type[config_util.ConfigurableConstants]):
         '''Updates controller parameters from the config object.'''
         if self.exo.side == constants.Side.LEFT:
-            print("LEFT: PEAK TORQUE= "+ str(config.LEFT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.LEFT_PEAK_FRACTION)+ "\tToe Off= "+str(config.LEFT_TOE_OFF_FRACTION))
+            print("\nLEFT: PEAK TORQUE= "+ str(config.LEFT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.LEFT_PEAK_FRACTION)+ "\tToe Off= "+str(config.LEFT_TOE_OFF_FRACTION))
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           left_peak_fraction=config.LEFT_PEAK_FRACTION,
                                                           right_peak_fraction=config.RIGHT_PEAK_FRACTION,
                                                           fall_fraction=config.FALL_FRACTION),
                               spline_y=self._get_spline_y(left_peak_torque=config.LEFT_PEAK_TORQUE, right_peak_torque=config.RIGHT_PEAK_TORQUE))
         else:
-            print("RIGHT: PEAK TORQUE= "+ str(config.RIGHT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.RIGHT_PEAK_FRACTION)+ "\tToe Off= "+str(config.RIGHT_TOE_OFF_FRACTION))
+            print("RIGHT: PEAK TORQUE= "+ str(config.RIGHT_PEAK_TORQUE)+ "\tPeak Fraction= "+str(config.RIGHT_PEAK_FRACTION)+ "\tToe Off= "+str(config.RIGHT_TOE_OFF_FRACTION)+"\n")
             super().update_spline(spline_x=self._get_spline_x(rise_fraction=config.RISE_FRACTION,
                                                           left_peak_fraction=config.LEFT_PEAK_FRACTION,
                                                           right_peak_fraction=config.RIGHT_PEAK_FRACTION,
